@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Find the Needle — Factory</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; padding: 30px 16px;
+      font-family: system-ui, sans-serif;
+      color: #f5f5e9; background: #17251b;
+    }
+    main { max-width: 700px; margin: auto; }
+    h1 { color: #e9c86c; }
+    .panel {
+      background: #263a2b; border: 1px solid #526c51;
+      border-radius: 14px; padding: 20px; margin: 16px 0;
+    }
+    button {
+      background: #d8b34f; color: #17251b; font-weight: bold;
+      border: 0; border-radius: 8px; padding: 12px 16px;
+      cursor: pointer; margin: 5px 4px 5px 0;
+    }
+    button:hover { background: #f3d67d; }
+    .stats { display: flex; flex-wrap: wrap; gap: 18px; }
+    .stat { font-size: 18px; }
+    #log { line-height: 1.8; color: #d4dfd0; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>🌾 Find the Needle</h1>
+  <p>Build your hay-processing factory. Automate the search.</p>
+
+  <section class="panel">
+    <div class="stats">
+      <div class="stat">Money: $<span id="money">100</span></div>
+      <div class="stat">Hay: <span id="hay">0</span></div>
+      <div class="stat">Needles: <span id="needles">0</span></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Your factory</h2>
+    <p id="log">Your factory is ready. Buy your first machine!</p>
+    <button id="collector">Buy collector ($25)</button>
+    <button id="scanner">Buy needle scanner ($50)</button>
+    <button id="sell">Sell 10 hay ($10)</button>
+  </section>
+
+  <section class="panel">
+    <h2>Research</h2>
+    <p>Collector level: <span id="level">1</span></p>
+    <button id="upgrade">Upgrade collector ($75)</button>
+  </section>
+</main>
+
+<script>
+  let money = 100, hay = 0, needles = 0;
+  let level = 1, collectors = 0, scanners = 0;
+
+  const $ = id => document.getElementById(id);
+  function update(message) {
+    $('money').textContent = Math.floor(money);
+    $('hay').textContent = Math.floor(hay);
+    $('needles').textContent = needles;
+    $('level').textContent = level;
+    if (message) $('log').textContent = message;
+  }
+
+  $('collector').onclick = () => {
+    if (money < 25) return update('Not enough money!');
+    money -= 25;
+    collectors++;
+    update('Collector purchased! Your factory is producing hay.');
+  };
+
+  $('scanner').onclick = () => {
+    if (money < 50) return update('Not enough money!');
+    money -= 50;
+    scanners++;
+    update('Scanner installed. It will occasionally find a needle.');
+  };
+
+  $('sell').onclick = () => {
+    if (hay < 10) return update('You need at least 10 hay to sell.');
+    hay -= 10;
+    money += 10;
+    update('Sold 10 hay for $10.');
+  };
+
+  $('upgrade').onclick = () => {
+    const cost = level * 75;
+    if (money < cost) return update('Not enough money for research.');
+    money -= cost;
+    level++;
+    update('Research complete! Collectors are now faster.');
+  };
+
+  setInterval(() => {
+    hay += collectors * level;
+    if (scanners && hay >= 10 && Math.random() < 0.02) {
+      hay -= 10;
+      needles += scanners;
+      money += 100 * scanners;
+      update('🎉 Needle detected! Your scanners earned $' +
+        (100 * scanners) + '!');
+    } else {
+      update();
+    }
+  }, 1000);
+</script>
+</body>
+</html>
